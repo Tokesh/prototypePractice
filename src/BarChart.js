@@ -12,21 +12,21 @@ const BarChart = ({ data }) => {
     },
     xAxis: {
         title: {
-            text: "Months",
+          text: "Months",
         },
-        categories: data.map((row) => row.Date),
-    },
+        categories: data.map((row) => row.monthYear),
+      },
     yAxis: {
         title: {
             text: "$ value",
         },
     },
     series: [
-      {
-        name: "Amount",
-        data: data.map((row) => parseFloat(row["Purchase Amount"].replace(/[^0-9.-]+/g, ""))),
-      },
-    ],
+        {
+          name: "Amount",
+          data: data.map((row) => row.total),
+        },
+      ],
   };
   console.log(data)
   return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;

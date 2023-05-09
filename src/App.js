@@ -1,25 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import CSVReader from "./CSVReader";
+import BarChart from "./BarChart";
 
-function App() {
+const App = () => {
+  const [csvData, setCsvData] = useState([]);
+
+  const handleCsvData = (data) => {
+    const last12MonthsData = data.slice(-12);
+    setCsvData(last12MonthsData);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <CSVReader handleData={handleCsvData} />
+      <BarChart data={csvData} />
     </div>
   );
-}
+};
 
 export default App;

@@ -28,7 +28,6 @@ const BarChart = ({ data }) => {
         },
       ],
   };
-  console.log(data)
   return <HighchartsReact highcharts={Highcharts} options={chartOptions} />;
 };
 

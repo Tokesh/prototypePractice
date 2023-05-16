@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CSVReader from "./CSVReader";
 import BarChart from "./BarChart";
+import Header from "./Header";
 
 const App = () => {
   const [csvData, setCsvData] = useState([]);
@@ -12,8 +13,9 @@ const App = () => {
 
   return (
     <div>
+      <Header />
       <CSVReader handleData={handleCsvData} />
-      <BarChart data={csvData} />
+      {csvData.length > 0 && <BarChart data={csvData} />}
     </div>
   );
 };

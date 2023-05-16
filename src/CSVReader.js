@@ -17,11 +17,11 @@ function CSVReader({ handleData }) {
             date: new Date(row.Date),
             description: row.Description,
             category: row.Type,
-            amount: parseFloat((row['Purchase Amount'] || '').replace(/[^0-9.-]/g, '').replace(/,/g, ''))
+            amount: parseFloat((row['Purchase Amount'] || '').replace(/[^0-9.-]/g, '').replace(/,"/g, ''))
           }));
           // const transactions = results.data.map((row) => {
-          //   const amountString = row['Purchase Amount'].replace(/[^0-9.-]/g, '').replace(/,/g, '');
-          
+          //   const amountString = row['Purchase Amount'].replace(/[^0-9.-]/g, '');
+            
           //   console.log(`Amount string: ${amountString}`);
           
           //   return {

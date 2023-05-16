@@ -1,5 +1,5 @@
-import React from 'react';
-import { AppBar, Toolbar, Button, IconButton, Badge, Avatar } from '@mui/material';
+import React, { useState } from 'react';
+import { AppBar, Toolbar, Button, IconButton, Badge, Avatar, Popover, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
@@ -35,7 +35,21 @@ const StyledAvatar = styled(Avatar)({
   backgroundColor: (theme) => theme.palette.primary.main,
 });
 
+
 const Header = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'user-popover' : undefined;
+
   return (
     <StyledAppBar position="static">
       <StyledToolbar>
@@ -43,17 +57,33 @@ const Header = () => {
           <StyledButton disabled>Overview</StyledButton>
           <StyledActiveButton>Expenses</StyledActiveButton>
         </StyledButtonContainer>
-        <IconButton>
+        <IconButton onClick={handleClick}>
           <Badge badgeContent={0} color="secondary">
             <StyledAvatar>
               <AccountCircleIcon />
             </StyledAvatar>
           </Badge>
         </IconButton>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        >
+          <Typography sx={{ p: 2 }}>Account</Typography>
+          <Typography sx={{ p: 2 }}>Settings</Typography>
+        </Popover>
       </StyledToolbar>
     </StyledAppBar>
   );
 };
 
 export default Header;
-    

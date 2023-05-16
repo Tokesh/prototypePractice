@@ -15,7 +15,7 @@ const App = () => {
     <div>
       <Header />
       <CSVReader handleData={handleCsvData} />
-      {csvData.length > 0 && <BarChart data={csvData} />}
+      {/* {csvData.length > 0 && <BarChart data={csvData} />} */}
     </div>
   );
 };

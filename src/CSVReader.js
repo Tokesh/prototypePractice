@@ -44,17 +44,66 @@ function CSVReader({ handleData }) {
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    Papa.parse(file, {
-      header: true,
-      complete: function (results) {
-        const transactions = results.data.map((row) => ({
-          date: new Date(row.Date),
-          description: row.Description,
-          category: row.Type,
-          amount: parseFloat((row['Purchase Amount'] || '').replace(/[^0-9.-]/g, '').replace(/,"/g, '')),
-        }));
 
-        const groupedByCategory = transactions.reduce((acc, transaction) => {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      const contents = e.target.result;
+
+      const lines = contents.split('\n');
+      
+      const updatedLines = lines.map((line) => {
+        if(!line.startsWith('"')) return line;
+        let isInQuotes = false;
+        let updatedLine = '';
+        // console.log(line)
+        
+        line = line.replace(/""/g, '"');
+        if(line.startsWith('"')) line = line.substring(1, line.length - 1);
+
+        // console.log(line)
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"' ) {
+            isInQuotes = !isInQuotes;
+          }
+          if (char === ',' && isInQuotes) {
+            updatedLine += '';
+          } else if(char !== '"'){
+            updatedLine += char;
+          }
+          
+        }
+        return updatedLine + '\r';
+      });
+    console.log(updatedLines)
+    const updatedContents = updatedLines.join('\n');
+
+    console.log(updatedContents);
+    Papa.parse(updatedContents, {
+      header: true,
+      delimiter: ',',
+      complete: function (results) {
+        console.log(results)
+        const transactions = results.data.map((row, index) => {
+          const amount = parseFloat(row['Purchase Amount'].replace(/[^0-9.-]/g, '').replace(/,/g, ''));
+          return {
+            date: new Date(row.Date),
+            description: row.Description,
+            category: row.Type,
+            amount: isNaN(amount) ? row['Purchase Amount'] : amount,
+            row: index + 1,
+          };
+        });
+  
+          const sortedTransactions = transactions.sort((a, b) => a.date - b.date);
+
+        const lastTransactionDate = sortedTransactions[sortedTransactions.length - 1].date;
+        const twelveMonthsAgo = new Date(lastTransactionDate).setFullYear(new Date(lastTransactionDate).getFullYear() - 1);
+
+        const filteredTransactions = sortedTransactions.filter((transaction) => transaction.date >= twelveMonthsAgo);
+
+        const groupedByCategory = filteredTransactions.reduce((acc, transaction) => {
           const category = transaction.category;
           if (!acc[category]) {
             acc[category] = { category, total: 0 };
@@ -63,7 +112,7 @@ function CSVReader({ handleData }) {
           return acc;
         }, {});
 
-        const groupedByMonth = transactions.reduce((acc, transaction) => {
+        const groupedByMonth = filteredTransactions.reduce((acc, transaction) => {
           const monthYear = transaction.date.toLocaleString('default', {
             month: 'long',
             year: 'numeric',
@@ -83,16 +132,20 @@ function CSVReader({ handleData }) {
           new Date(a.monthYear) - new Date(b.monthYear)
         );
 
-        const sortedTransactions = transactions.sort((a, b) => a.date - b.date);
-
         setTransactions(sortedByMonth);
         setTotalsByCategory(sortedByCategory);
-        setInitialTransactions(sortedTransactions);
+        setInitialTransactions(filteredTransactions);
         handleData(sortedByMonth);
-      },
-    });
+        },
+        delimiter: ',', // Установка разделителя
+      });
+    };
+  
+    reader.readAsText(file);
+
     setFileInputKey((prevKey) => prevKey + 1);
   };
+  
 
   const handleClearData = () => {
     setTransactions([]);
